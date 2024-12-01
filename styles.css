@@ -2,14 +2,14 @@
     padding-left: 4vw;
     padding-bottom: 1vh;
     padding-top: 1vh;
-    font-size: 24px;
+    font-size: 22px;
     font-family: Georgia;
     text-decoration: underline;
 }
 
 .content{
     padding-left: 8vw;
-    font-size: 18px;
+    font-size: 16px;
     font-family: Georgia;
 }
 
@@ -21,6 +21,10 @@ table{
 .th, .td{
     border: 2px solid black;
     padding: 4px;
+}
+
+li{
+    padding: 0.5vh;
 }
 
 .informationRow:hover{

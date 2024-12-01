@@ -27,6 +27,10 @@ li{
     padding: 0.5vh;
 }
 
+.tr{
+    text-align: center;
+}
+
 .informationRow:hover{
     background-color: #c2e7ff;
 }
@@ -37,5 +41,10 @@ li{
     background-color: #c2e7ff;
     min-height: 10vh;
 
+}
+
+.employeeInfo{
+    padding-left: 4vw;
+    font-size: 22px;
 }
 

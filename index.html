@@ -4,7 +4,8 @@
         <title>Restauraunt Manager</title>
 
         <!-- For JS File \/ \/ \/ -->
-        <script src=""></script> 
+        <script src="backend.js"></script> 
+        <script src="frontend.js"></script> 
 
         <!-- CSS/Bootstrap Files -->
         <link rel="stylesheet" href="styles.css">
@@ -22,6 +23,7 @@
                     <th class="th">Type</th>
                     <th class="th">Date Founded</th>
                 </tr>
+                <!-- ONCLICK to update employees and Order History based on Location -->
                 <tr class="informationRow" onclick="">
                     <td class="td">PLACEHOLDER</td>
                     <td class="td">PLACEHOLDER</td>
@@ -30,22 +32,90 @@
                 </tr>
             </table>
         </div>
-        <div class="sections">Business Contact:</div>
+        <div class="sections">Location Contact:</div>
         <div class="content">
             <div class="businessCard">
                 <ul>
-                    <li id="BCfname">First Name: </li>
-                    <li id="BClname">Last Name: </li>
-                    <li id="BCemail">Email Address: </li>
+                    <li>First Name: 
+                        <div id="BCfname"></div>
+                    </li>
+                    <li>Last Name: 
+                        <div id="BClname"></div>
+                    </li>
+                    <li>Email Address: 
+                        <a id="BCemail" href= "mailto: name@email.com"> name@email.com </a>
+                    </li>
                     <li>Website: 
                         <a id="BCwebsite" href="https://www.mcdonalds.com/us/en-us.html" target="_blank">https://www.mcdonalds.com/us/en-us.html</a>
                     </li>
-                    <li id="BCpnum">Phone Number: </li>
+                    <li>Phone Number: 
+                        <div id="BCpnum"></div>
+                    </li>
                 </ul>
             </div>
         </div>
-
-
+        <div class="sections">Employees: </div>
+        <div class="content">
+            <table>
+                <tr class="tr">
+                    <th class="th">Name</th>
+                </tr>
+                <tr id="employeeSelect" class="informationRow" onclick="openEmployee()">
+                    <td class="td">Select a Location</td>
+                </tr>
+            </table>
+        </div>
+        <div class="sections">Order History: </div>
+        <div class="content">
+            <table>
+                <tr class="tr">
+                    <th class="th">Name</th>
+                </tr>
+                <tr>
+                    <td class="td">Select a Location</td>
+                </tr>
+            </table>
+        </div>
+        <div class="sections">Suppliers:</div>
+        <div class="content">
+            <table>
+                <tr class="tr">
+                    <th class="th">Name</th>
+                    <th class="th">Country</th>
+                    <th class="th">Address</th>
+                    <th class="th">Ingredient Name</th>
+                    <th class="th">Price</th>
+                </tr>
+                <tr class="informationRow" onclick="">
+                    <td class="td">PLACEHOLDER</td>
+                    <td class="td">PLACEHOLDER</td>
+                    <td class="td">PLACEHOLDER</td>
+                    <td class="td">PLACEHOLDER</td>
+                    <td class="td">PLACEHOLDER</td>
+                </tr>
+            </table>
+        </div>
+        <div class="sections">Supplier Contact:</div>
+        <div class="content">
+            <div class="businessCard">
+                <ul>
+                    <li>First Name: 
+                        <div id="BCfname"></div>
+                    </li>
+                    <li>Last Name: 
+                        <div id="BClname"></div>
+                    </li>
+                    <li>Email Address: 
+                        <a id="BCemail" href= "mailto: name@email.com"> name@email.com </a>
+                    </li>
+                    <li>Website: 
+                        <a id="BCwebsite" href="https://www.mcdonalds.com/us/en-us.html" target="_blank">https://www.mcdonalds.com/us/en-us.html</a>
+                    </li>
+                    <li>Phone Number: 
+                        <div id="BCpnum"></div>
+                    </li>
+                </ul>
+            </div>
         </div>
     </body>
 </html>

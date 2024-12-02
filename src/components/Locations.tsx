@@ -8,7 +8,7 @@ const Locations = () => {
 
   const fetcher = async () => {
     try {
-      const res = await fetch('http://cse412-backend.ssree.dev/locations');
+      const res = await fetch('https://cse412-backend.ssree.dev/locations');
       const data = await res.json();
       setLocations([...locations, ...data]);
     } catch (err) {

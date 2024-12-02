@@ -1,0 +1,50 @@
+.sections{
+    padding-left: 4vw;
+    padding-bottom: 1vh;
+    padding-top: 1vh;
+    font-size: 22px;
+    font-family: Georgia;
+    text-decoration: underline;
+}
+
+.content{
+    padding-left: 8vw;
+    font-size: 16px;
+    font-family: Georgia;
+}
+
+table{
+    min-width: 80vw;
+    max-width: 92vw;
+}
+
+.th, .td{
+    border: 2px solid black;
+    padding: 4px;
+}
+
+li{
+    padding: 0.5vh;
+}
+
+.tr{
+    text-align: center;
+}
+
+.informationRow:hover{
+    background-color: #c2e7ff;
+}
+
+.businessCard{
+    width: 80vw;
+    border: 8px solid #6ac0f7;
+    background-color: #c2e7ff;
+    min-height: 10vh;
+
+}
+
+.employeeInfo{
+    padding-left: 4vw;
+    font-size: 22px;
+}
+

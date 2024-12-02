@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 
-const LocationPage = ({ params }: { params: { id: string } }) => {
+const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const [locname, setLocname] = useState('');
 
   const fetcher = async () => {

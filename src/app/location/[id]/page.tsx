@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import useSWR, { Fetcher } from 'swr';
+const fetcher = async (params: Promise<{id: string}>) => fetch(`https://cse412-backend.ssree.dev/location/${(await params).id}`).then(res => res.json());
 import Link from "next/link";
 
 const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
@@ -29,10 +31,13 @@ const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
   useEffect(() => {
     fetcher();
   }, []);
+  const { data, error, isLoading } = useSWR(params, fetcher);
+  if (isLoading) return <div>Loading...</div>
+  if (error) return <div>Failed to load!</div>
 
   return (
     <>
-      <h2 className="text-center">{locname}</h2>
+      <h2 className="text-center">{data.name}</h2>
       <div className="sections">Location Contact:</div>
       <div className="content">
         <div className="businessCard">

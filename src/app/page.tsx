@@ -1,7 +1,11 @@
 import React from 'react';
 import Locations from '~/components/Locations'
+import ReactDOM from 'react-dom'
+
 
 const Home = () => {
+  ReactDOM.preload("https://cse412-backend.ssree.dev/locations");
+
   return (
     <>
       <h1 className="text-center">Restaurant Manager</h1>

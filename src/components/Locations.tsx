@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import useSWR, { Fetcher } from 'swr';
+import useSWR, { Fetcher, preload } from 'swr';
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 const Locations = () => {
@@ -23,14 +23,14 @@ const Locations = () => {
           </tr>
         </thead>
         <tbody>
-          {data.map((location, index) => (
+          {data.map((location, index) => { preload(`https://cse412-backend.ssree.dev/location/${location.id}`, fetcher); return (
             <tr className='informationRow' key={index}>
                 <td className='td'><Link href={{ pathname: `/location/${location.id}` }}>{location.name}</Link></td>
                 <td className='td'>{location.address}</td>
                 <td className='td'>{location.loctype}</td>
                 <td className='td'>{location.datefounded}</td>
             </tr>
-          ))}
+          )})}
         </tbody>
       </table>
     </>

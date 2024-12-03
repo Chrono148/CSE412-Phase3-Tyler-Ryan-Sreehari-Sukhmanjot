@@ -2,23 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import useSWR, { Fetcher } from 'swr';
+const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 const Locations = () => {
-  const [locations, setLocations] = useState([]);
+  const { data, error, isLoading } = useSWR('https://cse412-backend.ssree.dev/locations', fetcher);
 
-  const fetcher = async () => {
-    try {
-      const res = await fetch('https://cse412-backend.ssree.dev/locations');
-      const data = await res.json();
-      setLocations([...locations, ...data]);
-    } catch (err) {
-      console.error('Error fetching locations:', err);
-    }
-  };
-
-  useEffect(() => {
-    fetcher();
-  }, []);
+  if (isLoading) return <div>Loading...</div>
+  if (error) return <div>Failed to load!</div>
 
   return (
     <>
@@ -32,7 +23,7 @@ const Locations = () => {
           </tr>
         </thead>
         <tbody>
-          {locations.map((location, index) => (
+          {data.map((location, index) => (
             <tr className='informationRow' key={index}>
                 <td className='td'><Link href={{ pathname: `/location/${location.id}` }}>{location.name}</Link></td>
                 <td className='td'>{location.address}</td>

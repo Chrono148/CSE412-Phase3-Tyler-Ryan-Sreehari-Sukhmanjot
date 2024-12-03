@@ -37,7 +37,7 @@ const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
   return (
     <>
-      <h2 className="text-center">{data.name}</h2>
+      <h2 className="text-center">{locname}</h2>
       <div className="sections">Location Contact:</div>
       <div className="content">
         <div className="businessCard">

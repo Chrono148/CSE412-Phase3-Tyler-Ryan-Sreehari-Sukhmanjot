@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom'
 
 
 const Home = () => {
-  ReactDOM.preload("https://cse412-backend.ssree.dev/locations");
+  ReactDOM.preload("https://cse412-backend.ssree.dev/locations", {as: "fetch"});
 
   return (
     <>

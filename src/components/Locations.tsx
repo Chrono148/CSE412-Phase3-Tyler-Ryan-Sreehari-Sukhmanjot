@@ -13,7 +13,7 @@ const Locations = () => {
   );
 
   const { data: employees, error: employeesError, isLoading: employeesLoading } = useSWR(
-    'http://localhost:6969/employee/pay/',
+    'https://cse412-backend.ssree.dev/employee/pay/',
     fetcher
   );
 

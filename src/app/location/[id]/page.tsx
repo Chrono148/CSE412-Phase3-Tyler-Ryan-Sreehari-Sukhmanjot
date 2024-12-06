@@ -4,8 +4,15 @@ import React, { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import Link from "next/link";
 
-const fetcher = async (params: Promise<{ id: string }>) =>
-  fetch(`https://cse412-backend.ssree.dev/location/${(await params).id}`).then(res => res.json());
+const businesscontactFetcher = async (params: [Promise<{ id: string }>, any]) =>
+  fetch(`https://cse412-backend.ssree.dev/businesscontact/${(await params[0]).id}`).then(res => res.json());
+const locationFetcher = async (params: [Promise<{ id: string }>, any]) => fetch(`https://cse412-backend.ssree.dev/location/${(await params[0]).id}`).then(res => res.json());
+const employeesFetcher = async (params: [Promise<{ id: string }>, any]) =>
+  fetch(`https://cse412-backend.ssree.dev/employeelist/${(await params[0]).id}`).then(res => res.json());
+const ingredientsFetcher = async (params: [Promise<{ id: string }>, any]) =>
+  fetch(`https://cse412-backend.ssree.dev/ingredient/${(await params[0]).id}`).then(res => res.json());
+const allemployeesFetcher = async (params: [Promise<{ id: string }>, any]) =>
+  fetch(`https://cse412-backend.ssree.dev/employee/${(await params[0]).id}/all`).then(res => res.json());
 
 const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -69,89 +76,63 @@ const getMissingIngredients = (ingredients, recipe) => {
 };
 
 const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
-  const [locname, setLocname] = useState('');
-  const [bizcarddata, setbizcarddata] = useState(null);
-  const [employees, setEmployees] = useState([]);
   const [selectedDay, setSelectedDay] = useState('Sunday'); // Default day is Sunday
-  const [dayEmployees, setDayEmployees] = useState([]);
-  const [ingredients, setIngredients] = useState([]);
-  const [availableRecipes, setAvailableRecipes] = useState([]);
-  const [unavailableRecipes, setUnavailableRecipes] = useState([]);
-  const [locationId, setLocationId] = useState('');
 
+  const { data: location, error: locationError, isLoading: locationLoading } = useSWR(
+    [params, "location"],
+    locationFetcher
+  );
 
-  const fetcher = async () => {
-    try {
-      const resolvedParams = await params;
-      setLocationId(resolvedParams.id);
+  const { data: businesscontact, error: businesscontactError, isLoading: businesscontactLoading } = useSWR(
+    [params, "businesscontact"],
+    businesscontactFetcher
+  );
 
-      const res = await fetch(`https://cse412-backend.ssree.dev/location/${(await params).id}`);
-      const data = await res.json();
-      setLocname(data.name);
+  const { data: employeelist, error: emplistError, isLoading: emplistLoading } = useSWR(
+    [params, "employeelist"],
+    employeesFetcher
+  );
 
-      const biz_res = await fetch(`http://localhost:6969/businesscontact/${(await params).id}`);
-      const biz_data = await biz_res.json();
-      setbizcarddata(biz_data);
+  const { data: ingredients, error: ingredientsError, isLoading: ingredientsLoading } = useSWR(
+    [params, "ingredients"],
+    ingredientsFetcher
+  );
+  const { data: allemployees, error: allemployeesError, isLoading: allemployeesLoading } = useSWR(
+    [params, "allemployees"],
+    allemployeesFetcher
+  );
+  const loading = locationLoading || businesscontactLoading || emplistLoading || ingredientsLoading || allemployeesLoading;
+  const the_errors = locationError || businesscontactError || emplistError || ingredientsError || allemployeesError;
+  if (loading) return <div>Loading...</div>;
+  if (the_errors) return <div>Failed to load!</div>;
 
-      const empRes = await fetch(`http://localhost:6969/employeelist/${(await params).id}`);
-      const empData = await empRes.json();
-      setEmployees(empData);
+  const possibleRecipes = recipes.filter((recipe) =>
+    canMakeRecipe(ingredients, recipe)
+  );
+  const impossibleRecipes = recipes.filter((recipe) => {
+    return !canMakeRecipe(ingredients, recipe);
+  });
+  
 
-      const locnum = (await params).id;
-      const ingredientRes = await fetch(`http://localhost:6969/ingredient/${locnum}`);
-      const ingredientData = await ingredientRes.json();
-      setIngredients(ingredientData);
-
-      const possibleRecipes = recipes.filter((recipe) =>
-        canMakeRecipe(ingredientData, recipe)
-      );
-      const impossibleRecipes = recipes.filter((recipe) => {
-        return !canMakeRecipe(ingredientData, recipe);
-      });
-
-      setAvailableRecipes(possibleRecipes);
-      setUnavailableRecipes(impossibleRecipes);
-
-      // Fetch employees working on the default selected day
-      fetchDayEmployees('Sunday');
-    } catch (err) {
-      console.error('Error fetching data:', err);
-    }
-  };
-
-  const fetchDayEmployees = async (day: string) => {
-    try {
-      const res = await fetch(`http://localhost:6969/employee/${(await params).id}/${day}`);
-      const data = await res.json();
-      setDayEmployees(data);
-    } catch (err) {
-      console.error('Error fetching employees for the day:', err);
-      setDayEmployees([]);
-    }
-  };
 
   const handleDayChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedDay = event.target.value;
     setSelectedDay(selectedDay);
-    fetchDayEmployees(selectedDay);
   };
 
-  useEffect(() => {
-    fetcher();
-  }, []);
-
+  const filteredAllEmployees = allemployees.filter(emp => emp.schday == selectedDay);
   return (
     <>
-      <h2 className="text-center">{locname}</h2>
+      <h2 className="text-center">{location.name}</h2>
       <div className="sections">Location Contact:</div>
       <div className="content">
         <div className="businessCard">
           <ul>
-            <li>First Name: <div id="BCfname">{bizcarddata?.fname || ''}</div></li>
-            <li>Last Name: <div id="BClname">{bizcarddata?.lname || ''}</div></li>
-            <li>Email Address: <a id="BCemail">{bizcarddata?.email || ''}</a></li>
-            <li>Website: <a id="BCwebsite">{bizcarddata?.website || ''}</a></li>
-            <li>Phone Number: <div id="BCpnum">{bizcarddata?.phone || ''}</div></li>
+            <li>First Name: <div id="BCfname">{businesscontact?.fname || ''}</div></li>
+            <li>Last Name: <div id="BClname">{businesscontact?.lname || ''}</div></li>
+            <li>Email Address: <a id="BCemail">{businesscontact?.email || ''}</a></li>
+            <li>Website: <a id="BCwebsite">{businesscontact?.website || ''}</a></li>
+            <li>Phone Number: <div id="BCpnum">{businesscontact?.phone || ''}</div></li>
           </ul>
         </div>
       </div>
@@ -159,7 +140,7 @@ const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
       <div className="sections">Employees:</div>
       <div className="content">
         <div className="employeeInfo">
-          {employees.length > 0 ? (
+          {employeelist.length > 0 ? (
             <table>
               <thead>
                 <tr>
@@ -169,7 +150,7 @@ const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
                 </tr>
               </thead>
               <tbody>
-                {employees.map((employee, index) => (
+                {employeelist.map((employee, index) => (
                   <tr key={index}>
                     <td>{employee.empfname}</td>
                     <td>{employee.emplname}</td>
@@ -201,9 +182,9 @@ const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
         </div>
         <div className="employeeList">
           <h3>Employees working on {selectedDay}:</h3>
-          {dayEmployees.length > 0 ? (
+          {filteredAllEmployees.length > 0 ? (
             <ul>
-              {dayEmployees.map((employee, index) => (
+              {filteredAllEmployees.map((employee, index) => (
                 <li key={index}>
                   {employee.empfname} {employee.emplname}
                 </li>
@@ -218,9 +199,9 @@ const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
       <div className="sections">Available Recipes:</div>
       <div className="content">
         <h3>Recipes You Can Make:</h3>
-        {availableRecipes.length > 0 ? (
+        {possibleRecipes.length > 0 ? (
           <ul>
-            {availableRecipes.map((recipe, index) => (
+            {possibleRecipes.map((recipe, index) => (
               <li key={index}>{recipe.name}</li>
             ))}
           </ul>
@@ -232,9 +213,9 @@ const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
       <div className="sections">Unavailable Recipes:</div>
       <div className="content">
         <h3>Recipes You Cannot Make:</h3>
-        {unavailableRecipes.length > 0 ? (
+        {impossibleRecipes.length > 0 ? (
           <ul>
-            {unavailableRecipes.map((recipe, index) => (
+            {impossibleRecipes.map((recipe, index) => (
               <li key={index}>
                 {recipe.name} - Missing Ingredients:
                 <ul>
@@ -252,7 +233,7 @@ const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
       {/* Add Button to Go to Order Page */}
       <div className="content">
-  <Link href={`/order/${locationId}`} passHref>
+  <Link href={`/order/${location.num}`} passHref>
     <button className="order-button">Order More Ingredients</button>
   </Link>
       </div>

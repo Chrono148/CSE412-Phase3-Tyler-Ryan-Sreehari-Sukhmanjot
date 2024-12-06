@@ -9,12 +9,84 @@ const fetcher = async (params: Promise<{ id: string }>) =>
 
 const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+// Hardcoded recipe data
+const recipes = [
+  {
+    name: "Fried Rice",
+    ingredients: [
+      { ingname: "Basmati Rice", ingqty: 2, ingmeasurementtype: "Pounds" },
+      // { ingname: "Green Peas", ingqty: 1, ingmeasurementtype: "Pounds" },
+      // { ingname: "Onion", ingqty: 1, ingmeasurementtype: "Pounds" },
+      // { ingname: "Garlic", ingqty: 2, ingmeasurementtype: "Cloves" },
+      // { ingname: "Eggs", ingqty: 2, ingmeasurementtype: "Dozens" },
+      // { ingname: "Soy Sauce Bottle", ingqty: 2, ingmeasurementtype: "Count" },
+    ],
+  },
+  {
+    name: "Vegetable Stir-Fry",
+    ingredients: [
+      { ingname: "Carrot", ingqty: 1, ingmeasurementtype: "Pounds" },
+      { ingname: "Green Peas", ingqty: 1, ingmeasurementtype: "Pounds" },
+      { ingname: "Onion", ingqty: 1, ingmeasurementtype: "Pounds" },
+      { ingname: "Garlic", ingqty: 2, ingmeasurementtype: "Cloves" },
+      { ingname: "Soy Sauce Bottle", ingqty: 2, ingmeasurementtype: "Count" },
+      { ingname: "Parsley", ingqty: 1, ingmeasurementtype: "Pounds" },
+    ],
+  },
+  {
+    name: "Scrambled Eggs with Vegetables",
+    ingredients: [
+      { ingname: "Eggs", ingqty: 4, ingmeasurementtype: "Dozens" },
+      { ingname: "Onion", ingqty: 1, ingmeasurementtype: "Pounds" },
+      { ingname: "Garlic", ingqty: 1, ingmeasurementtype: "Cloves" },
+      { ingname: "Parsley", ingqty: 1, ingmeasurementtype: "Pounds" },
+      { ingname: "Salt Container", ingqty: 1, ingmeasurementtype: "Count" },
+    ],
+  },
+  {
+    name: "Corn and Pea Salad",
+    ingredients: [
+      { ingname: "Corn Cob", ingqty: 2, ingmeasurementtype: "Pounds" },
+      { ingname: "Green Peas", ingqty: 1, ingmeasurementtype: "Pounds" },
+      { ingname: "Parsley", ingqty: 1, ingmeasurementtype: "Pounds" },
+      { ingname: "Salt Container", ingqty: 1, ingmeasurementtype: "Count" },
+      { ingname: "Soy Sauce Bottle", ingqty: 1, ingmeasurementtype: "Count" },
+    ],
+  },
+  {
+    name: "Carrot-Parsley Soup",
+    ingredients: [
+      { ingname: "Carrot", ingqty: 2, ingmeasurementtype: "Pounds" },
+      { ingname: "Onion", ingqty: 1, ingmeasurementtype: "Pounds" },
+      { ingname: "Garlic", ingqty: 2, ingmeasurementtype: "Cloves" },
+      { ingname: "Parsley", ingqty: 1, ingmeasurementtype: "Pounds" },
+      { ingname: "Salt Container", ingqty: 1, ingmeasurementtype: "Count" },
+      { ingname: "Water", ingqty: 3, ingmeasurementtype: "Pounds" },
+    ],
+  },
+];
+
+// Helper function to check if a recipe can be made
+const canMakeRecipe = (ingredients, recipe) => {
+  return recipe.ingredients.every((recipeIngredient) => {
+    const locationIngredient = ingredients.find(
+      (locIng) => locIng.ingname === recipeIngredient.ingname
+    );
+    return (
+      locationIngredient &&
+      locationIngredient.ingqty >= recipeIngredient.ingqty
+    );
+  });
+};
+
 const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const [locname, setLocname] = useState('');
   const [bizcarddata, setbizcarddata] = useState(null);
   const [employees, setEmployees] = useState([]);
   const [selectedDay, setSelectedDay] = useState('Sunday'); // Default day is Sunday
   const [dayEmployees, setDayEmployees] = useState([]);
+  const [ingredients, setIngredients] = useState([]);
+  const [availableRecipes, setAvailableRecipes] = useState([]);
 
   const fetcher = async () => {
     try {
@@ -29,6 +101,16 @@ const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
       const empRes = await fetch(`http://localhost:6969/employeelist/${(await params).id}`);
       const empData = await empRes.json();
       setEmployees(empData);
+
+      const locnum = (await params).id;
+      const ingredientRes = await fetch(`http://localhost:6969/ingredient/${locnum}`);
+      const ingredientData = await ingredientRes.json();
+      setIngredients(ingredientData);
+
+      const possibleRecipes = recipes.filter((recipe) =>
+        canMakeRecipe(ingredientData, recipe)
+      );
+      setAvailableRecipes(possibleRecipes);
 
       // Fetch employees working on the default selected day
       fetchDayEmployees('Sunday');
@@ -106,7 +188,7 @@ const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
         </div>
       </div>
       <div className="sections">Employee selector:</div>
-        <div className="content">
+      <div className="content">
         <div className="day-selector">
           <label htmlFor="dayDropdown">Select a day:</label>
           <select id="dayDropdown" value={selectedDay} onChange={handleDayChange}>
@@ -131,6 +213,20 @@ const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
             <p>No employees scheduled for this day.</p>
           )}
         </div>
+      </div>
+
+      <div className="sections">Recipes:</div>
+      <div className="content">
+        <h3>Available Recipes:</h3>
+        {availableRecipes.length > 0 ? (
+          <ul>
+            {availableRecipes.map((recipe, index) => (
+              <li key={index}>{recipe.name}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>No recipes can be made with the current ingredients.</p>
+        )}
       </div>
     </>
   );

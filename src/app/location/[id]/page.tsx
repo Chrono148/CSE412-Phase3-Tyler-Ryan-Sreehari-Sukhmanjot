@@ -15,53 +15,30 @@ const recipes = [
     name: "Fried Rice",
     ingredients: [
       { ingname: "Basmati Rice", ingqty: 2, ingmeasurementtype: "Pounds" },
-      // { ingname: "Green Peas", ingqty: 1, ingmeasurementtype: "Pounds" },
-      // { ingname: "Onion", ingqty: 1, ingmeasurementtype: "Pounds" },
-      // { ingname: "Garlic", ingqty: 2, ingmeasurementtype: "Cloves" },
-      // { ingname: "Eggs", ingqty: 2, ingmeasurementtype: "Dozens" },
-      // { ingname: "Soy Sauce Bottle", ingqty: 2, ingmeasurementtype: "Count" },
     ],
   },
   {
     name: "Vegetable Stir-Fry",
     ingredients: [
       { ingname: "Carrot", ingqty: 1, ingmeasurementtype: "Pounds" },
-      { ingname: "Green Peas", ingqty: 1, ingmeasurementtype: "Pounds" },
-      { ingname: "Onion", ingqty: 1, ingmeasurementtype: "Pounds" },
-      { ingname: "Garlic", ingqty: 2, ingmeasurementtype: "Cloves" },
-      { ingname: "Soy Sauce Bottle", ingqty: 2, ingmeasurementtype: "Count" },
-      { ingname: "Parsley", ingqty: 1, ingmeasurementtype: "Pounds" },
     ],
   },
   {
     name: "Scrambled Eggs with Vegetables",
     ingredients: [
       { ingname: "Eggs", ingqty: 4, ingmeasurementtype: "Dozens" },
-      { ingname: "Onion", ingqty: 1, ingmeasurementtype: "Pounds" },
-      { ingname: "Garlic", ingqty: 1, ingmeasurementtype: "Cloves" },
-      { ingname: "Parsley", ingqty: 1, ingmeasurementtype: "Pounds" },
-      { ingname: "Salt Container", ingqty: 1, ingmeasurementtype: "Count" },
     ],
   },
   {
     name: "Corn and Pea Salad",
     ingredients: [
       { ingname: "Corn Cob", ingqty: 2, ingmeasurementtype: "Pounds" },
-      { ingname: "Green Peas", ingqty: 1, ingmeasurementtype: "Pounds" },
-      { ingname: "Parsley", ingqty: 1, ingmeasurementtype: "Pounds" },
-      { ingname: "Salt Container", ingqty: 1, ingmeasurementtype: "Count" },
-      { ingname: "Soy Sauce Bottle", ingqty: 1, ingmeasurementtype: "Count" },
     ],
   },
   {
     name: "Carrot-Parsley Soup",
     ingredients: [
       { ingname: "Carrot", ingqty: 2, ingmeasurementtype: "Pounds" },
-      { ingname: "Onion", ingqty: 1, ingmeasurementtype: "Pounds" },
-      { ingname: "Garlic", ingqty: 2, ingmeasurementtype: "Cloves" },
-      { ingname: "Parsley", ingqty: 1, ingmeasurementtype: "Pounds" },
-      { ingname: "Salt Container", ingqty: 1, ingmeasurementtype: "Count" },
-      { ingname: "Water", ingqty: 3, ingmeasurementtype: "Pounds" },
     ],
   },
 ];
@@ -79,6 +56,18 @@ const canMakeRecipe = (ingredients, recipe) => {
   });
 };
 
+// Helper function to find missing ingredients
+const getMissingIngredients = (ingredients, recipe) => {
+  return recipe.ingredients
+    .filter((recipeIngredient) => {
+      const locationIngredient = ingredients.find(
+        (locIng) => locIng.ingname === recipeIngredient.ingname
+      );
+      return !locationIngredient || locationIngredient.ingqty < recipeIngredient.ingqty;
+    })
+    .map((missingIngredient) => missingIngredient.ingname);
+};
+
 const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const [locname, setLocname] = useState('');
   const [bizcarddata, setbizcarddata] = useState(null);
@@ -87,9 +76,15 @@ const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const [dayEmployees, setDayEmployees] = useState([]);
   const [ingredients, setIngredients] = useState([]);
   const [availableRecipes, setAvailableRecipes] = useState([]);
+  const [unavailableRecipes, setUnavailableRecipes] = useState([]);
+  const [locationId, setLocationId] = useState('');
+
 
   const fetcher = async () => {
     try {
+      const resolvedParams = await params;
+      setLocationId(resolvedParams.id);
+
       const res = await fetch(`https://cse412-backend.ssree.dev/location/${(await params).id}`);
       const data = await res.json();
       setLocname(data.name);
@@ -110,7 +105,12 @@ const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
       const possibleRecipes = recipes.filter((recipe) =>
         canMakeRecipe(ingredientData, recipe)
       );
+      const impossibleRecipes = recipes.filter((recipe) => {
+        return !canMakeRecipe(ingredientData, recipe);
+      });
+
       setAvailableRecipes(possibleRecipes);
+      setUnavailableRecipes(impossibleRecipes);
 
       // Fetch employees working on the default selected day
       fetchDayEmployees('Sunday');
@@ -166,7 +166,6 @@ const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
                   <th>First name</th>
                   <th>Last name</th>
                   <th>Email</th>
-
                 </tr>
               </thead>
               <tbody>
@@ -187,6 +186,7 @@ const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
           ) : (<p>No employees listed.</p>)}
         </div>
       </div>
+
       <div className="sections">Employee selector:</div>
       <div className="content">
         <div className="day-selector">
@@ -215,9 +215,9 @@ const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
         </div>
       </div>
 
-      <div className="sections">Recipes:</div>
+      <div className="sections">Available Recipes:</div>
       <div className="content">
-        <h3>Available Recipes:</h3>
+        <h3>Recipes You Can Make:</h3>
         {availableRecipes.length > 0 ? (
           <ul>
             {availableRecipes.map((recipe, index) => (
@@ -227,6 +227,34 @@ const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
         ) : (
           <p>No recipes can be made with the current ingredients.</p>
         )}
+      </div>
+
+      <div className="sections">Unavailable Recipes:</div>
+      <div className="content">
+        <h3>Recipes You Cannot Make:</h3>
+        {unavailableRecipes.length > 0 ? (
+          <ul>
+            {unavailableRecipes.map((recipe, index) => (
+              <li key={index}>
+                {recipe.name} - Missing Ingredients:
+                <ul>
+                  {getMissingIngredients(ingredients, recipe).map((ingredient, idx) => (
+                    <li key={idx}>{ingredient}</li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>All recipes can be made with the current ingredients.</p>
+        )}
+      </div>
+
+      {/* Add Button to Go to Order Page */}
+      <div className="content">
+  <Link href={`/order/${locationId}`} passHref>
+    <button className="order-button">Order More Ingredients</button>
+  </Link>
       </div>
     </>
   );

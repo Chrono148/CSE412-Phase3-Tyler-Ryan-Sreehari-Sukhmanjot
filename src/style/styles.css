@@ -124,3 +124,45 @@ body {
 .employeeList li {
   margin: 0.5rem 0;
 }
+
+/* Suppliers Section */
+.supplier-card {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  border-radius: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.supplier-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.order-section {
+  margin-top: 10px;
+}
+
+.ingredient-option {
+  display: flex;
+  align-items: center;
+  margin: 0.5rem 0;
+}
+
+.ingredient-option label {
+  margin-left: 8px;
+  font-size: 16px;
+  font-family: Georgia;
+}
+
+.order-button {
+  background-color: #4caf50;
+  color: white;
+  width: auto;
+  padding: 0.6rem;
+  font-family: Georgia;
+  font-size: 16px;
+}
+
+.order-button:hover {
+  background-color: #45a049;
+}

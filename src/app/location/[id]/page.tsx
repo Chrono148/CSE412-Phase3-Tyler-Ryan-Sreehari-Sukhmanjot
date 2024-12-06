@@ -76,6 +76,37 @@ const LocationPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
       <div className="sections">Employees:</div>
       <div className="content">
+        <div className="employeeInfo">
+          {employees.length > 0 ? (
+            <table>
+              <thead>
+                <tr>
+                  <th>First name</th>
+                  <th>Last name</th>
+                  <th>Email</th>
+
+                </tr>
+              </thead>
+              <tbody>
+                {employees.map((employee, index) => (
+                  <tr key={index}>
+                    <td>{employee.empfname}</td>
+                    <td>{employee.emplname}</td>
+                    <td>
+                      <a href={`mailto:${employee.email || ''}`}>
+                        {employee.email || 'N/A'}
+                      </a>
+                    </td>
+                    <td><Link href={{ pathname: `/employee/${employee.empnum}` }}>Schedule</Link></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (<p>No employees listed.</p>)}
+        </div>
+      </div>
+      <div className="sections">Employee selector:</div>
+        <div className="content">
         <div className="day-selector">
           <label htmlFor="dayDropdown">Select a day:</label>
           <select id="dayDropdown" value={selectedDay} onChange={handleDayChange}>

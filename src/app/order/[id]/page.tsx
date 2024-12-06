@@ -11,7 +11,7 @@ const OrdersPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const fetchSuppliersAndIngredients = async () => {
     try {
       // Fetch suppliers
-      const suppliersRes = await fetch('http://localhost:6969/businesscontact/suppliers');
+      const suppliersRes = await fetch('https://cse412-backend.ssree.dev/businesscontact/suppliers');
       const suppliersData = await suppliersRes.json();
       setSuppliers(suppliersData);
 
@@ -51,7 +51,7 @@ const OrdersPage = ({ params }: { params: Promise<{ id: string }> }) => {
         return;
       }
 
-      const response = await fetch(`http://localhost:6969/order/${_locnum}`, {
+      const response = await fetch(`https://cse412-backend.ssree.dev/order/${_locnum}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ingredients: orderedIngredients, supnum }),
